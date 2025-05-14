@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '../auth/[...nextauth]/options';
 
-// GET all expenses for the current user
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
@@ -67,43 +66,5 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating expense:', error);
     return NextResponse.json({ error: 'Failed to create expense' }, { status: 500 });
-  }
-}
-
-export async function PUT(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  try {
-    const { id, title, amount, description } = await request.json();
-
-    // Validate required fields
-    if (!id || !title || amount === undefined) {
-      return NextResponse.json({ error: 'ID, title, and amount are required' }, { status: 400 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }, 
-    })
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    const expense = await prisma.expense.update({
-      where: { id },
-      data: {
-        title,
-        amount: parseFloat(amount),
-        description,
-        userId: user.id,
-      },
-    })
-    return NextResponse.json(expense, { status: 200 });
-  } catch (error) {
-    console.error('Error updating expense:', error);
-    return NextResponse.json({ error: 'Failed to update expense' }, { status: 500 });
   }
 }
