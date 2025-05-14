@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
-    
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -25,30 +24,25 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json(expenses);
   } catch (error) {
-    console.error('Error fetching expenses:', error);
     return NextResponse.json({ error: 'Failed to fetch expenses' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  
   if (!session?.user?.email) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   
   try {
     const { title, amount, description } = await request.json();
-    
-    // Validate required fields
-    if (!title || amount === undefined) {
+        if (!title || amount === undefined) {
       return NextResponse.json({ error: 'Title and amount are required' }, { status: 400 });
     }
     
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
-    
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -64,7 +58,6 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json(expense, { status: 201 });
   } catch (error) {
-    console.error('Error creating expense:', error);
     return NextResponse.json({ error: 'Failed to create expense' }, { status: 500 });
   }
 }
