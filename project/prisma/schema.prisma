@@ -19,6 +19,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  expenses      Expense[]
   accounts      Account[]
   sessions      Session[]
 }
@@ -56,4 +57,14 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  title       String
+  amount      Float
+  date        DateTime @default(now())
+  description String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
